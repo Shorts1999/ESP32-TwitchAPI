@@ -1,0 +1,25 @@
+{
+    "name": "ESP32-TwitchAPI",
+    "version": "1.0.0",
+    "description": "do this later",
+    "keywords": "also this later",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Shorts1999/ESP32-TwitchAPI.git"
+    },
+    "authors": [
+        {
+            "name": "Shorts"
+        }
+    ],
+    "license": "MIT",
+    "homepage": "github.com/Shorts1999/ESP32-TwitchAPI",
+    "dependencies": {
+        "bblanchon/ArduinoJson": "~6.17.2",
+        "me-no-dev/AsyncTCP": "",
+        "me-no-dev/ESP Async WebServer": "",
+        "tzapu/WiFiManager.git": "~2.0.0"
+    },
+    "frameworks": "*",
+    "platforms": "*"
+}
