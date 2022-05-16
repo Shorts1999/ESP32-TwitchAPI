@@ -26,6 +26,7 @@ public:
     //Public members:
 
     //Public Methods:
+    void loopserver();
 
 
 private:
@@ -36,8 +37,7 @@ private:
     httpsserver::HTTPSServer *server;   //HTTPS server
     //Server nodes:
     httpsserver::ResourceNode *nodeRoot;
-
-    // void (*handleRoot)(httpsserver::HTTPRequest *request, httpsserver::HTTPResponse *response);
+    httpsserver::ResourceNode *nodeNotFound;
 
     //Private methods:
 };

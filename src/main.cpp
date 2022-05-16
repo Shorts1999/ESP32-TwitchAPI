@@ -4,6 +4,8 @@
 
 #include <TwitchAPI.h>
 
+TwitchAPI *twitchapi;
+
 void setup() {
     Serial.begin(115200);
     Preferences wifiNVS;
@@ -19,21 +21,16 @@ void setup() {
     WiFi.begin(SSID.c_str(), password.c_str());
 
     Serial.print("[WIFI] Connecting..");
-    while(WiFi.status() != WL_CONNECTED){
+    while (WiFi.status() != WL_CONNECTED) {
         Serial.print(".");
         delay(200);
     }
     Serial.print("\n");
-    
-    TwitchAPI twitchApi = TwitchAPI("ESPTwitchBot");
-    while(1){
-        delay(20000);
-        log_d("Running...");
-    }
 
-    
+    twitchapi = new TwitchAPI("ESPTwitchBot");
 }
 void loop() {
+    twitchapi->loopserver();
 
 }
 
