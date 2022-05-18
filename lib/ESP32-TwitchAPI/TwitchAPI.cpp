@@ -3,7 +3,33 @@
 
 const char *TAG = "TwitchAPI";
 
-TwitchAPI::TwitchAPI(const char *dnsName) {
+static String HTMLPAGE = "<!DOCTYPE html>"
+"<html>"
+"<script>"
+"function checkToken(){"
+"let oauth=location.hash.substring(location.hash.indexOf(\"access_token\")).split('&')[0].split('=')[1];"
+    "if(oauth!=undefined){let xhr=new XMLHttpRequest(); xhr.open('POST','/authtoken'); xhr.send(oauth);}}"
+"</script>"
+"<body onload=\"checkToken()\">"
+"<a href=\"https://id.twitch.tv/oauth2/authorize?"
+"response_type=token"
+"&client_id=idPlaceholder"
+"&redirect_uri=https://dnsPlaceholder.local/"
+"&scope=chat:read+chat:edit channel:moderate whispers:read whispers:edit channel_editor\">"
+"CLICK HERE TO LOG IN</a></body>"
+"</html>";
+
+TwitchAPI::TwitchAPI(const char *dnsName, const char *clientId) {
+    mClientId = new char[strlen(clientId) + 1]; //Add +1 for null terminator
+    log_d("Allocated %d for clientId", strlen(clientId));
+    strcpy(mClientId, clientId);
+    log_d("Saved clientID %s", mClientId);
+
+    //Is there a better way to do this?
+    HTMLPAGE.replace("idPlaceholder", clientId);
+    HTMLPAGE.replace("dnsPlaceholder", dnsName);
+    log_d("%s", HTMLPAGE.c_str());
+
     //Create an MDNS:
     log_d("Created TwitchAPI with DNS %s", dnsName);
     if (MDNS.begin(dnsName)) {
@@ -59,20 +85,7 @@ TwitchAPI::TwitchAPI(const char *dnsName) {
         // Status code is 200 OK by default.
         // We want to deliver a simple HTML page, so we send a corresponding content type:
         response->setHeader("Content-Type", "text/html");
-
-        // The response implements the Print interface, so you can use it just like
-        // you would write to Serial etc.
-        response->println("<!DOCTYPE html>");
-        response->println("<html>");
-        response->println("<head><title>Hello World!</title></head>");
-        response->println("<body>");
-        response->println("<h1>Hello World!</h1>");
-        response->print("<p>Your server is running for ");
-        // A bit of dynamic data: Show the uptime
-        response->print((int)(millis() / 1000), DEC);
-        response->println(" seconds.</p>");
-        response->println("</body>");
-        response->println("</html>");
+        response->print(HTMLPAGE);
     });
 
     nodeNotFound = new httpsserver::ResourceNode("/", "GET",
@@ -95,12 +108,22 @@ TwitchAPI::TwitchAPI(const char *dnsName) {
         response->println("<body><h1>404 Not Found</h1><p>The requested resource was not found on this server.</p></body>");
         response->println("</html");
     });
+    receiveOauth = new httpsserver::ResourceNode("/authtoken", "POST",
+        [](httpsserver::HTTPRequest *request, httpsserver::HTTPResponse *response) {
+        size_t requestLength = request->getContentLength();
+        char requestBuffer[requestLength+1];//add one for null terminator
+        request->readChars(requestBuffer, requestLength);
+        requestBuffer[requestLength] = '\0'; //manually add null terminator to end string
+        log_d("%s", requestBuffer);
+    });
+
 
     log_d("Creating server");
     server = new httpsserver::HTTPSServer(certificate);
 
     log_d("Registering node:");
     server->registerNode(nodeRoot);
+    server->registerNode(receiveOauth);
     server->setDefaultNode(nodeNotFound);
     log_d("Starting server");
     server->start();

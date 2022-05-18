@@ -4,21 +4,22 @@
 #define CORE_DEBUG_LEVEL 4
 #include <Arduino.h>
 #include <WiFi.h>
+#include <ESPmDNS.h>
+#include <ArduinoJson.h>
 // Includes for the server
 #include <HTTPSServer.hpp>
 #include <SSLCert.hpp>
 #include <HTTPRequest.hpp>
 #include <HTTPResponse.hpp>
+#include <WebsocketHandler.hpp>
 
-#include <ESPmDNS.h>
-#include <ArduinoJson.h>
 #include <Preferences.h>
 
 
 class TwitchAPI {
 public:
     //constructor:
-    TwitchAPI(const char *dnsName);
+    TwitchAPI(const char *dnsName, const char *clientID);
     //Destructor:
     ~TwitchAPI();
 
@@ -31,6 +32,7 @@ public:
 
 private:
     //Private members:
+    char* mClientId;
     Preferences apiNvs;                 //Non-volatile storage section
     httpsserver::SSLCert *certificate;  //self-signed certificate
 
@@ -38,6 +40,7 @@ private:
     //Server nodes:
     httpsserver::ResourceNode *nodeRoot;
     httpsserver::ResourceNode *nodeNotFound;
+    httpsserver::ResourceNode *receiveOauth;
 
     //Private methods:
 };

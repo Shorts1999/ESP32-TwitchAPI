@@ -4,6 +4,9 @@
 
 #include <TwitchAPI.h>
 
+const char* myClientId = "8460mbnko5p0n4e0fftgvvfaxf3fzt";
+const char* espDns = "esptwitchbot";
+
 TwitchAPI *twitchapi;
 
 void setup() {
@@ -27,7 +30,7 @@ void setup() {
     }
     Serial.print("\n");
 
-    twitchapi = new TwitchAPI("ESPTwitchBot");
+    twitchapi = new TwitchAPI(espDns, myClientId);
 }
 void loop() {
     twitchapi->loopserver();
