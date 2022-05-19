@@ -24,6 +24,7 @@ public:
     //Destructor:
     ~TwitchAPI();
 
+    //To return both the username and userId from fetchUserData function
     typedef struct userData{
         String userId;
         String userName;

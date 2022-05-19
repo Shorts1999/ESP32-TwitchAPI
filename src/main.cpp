@@ -38,16 +38,14 @@ void setup() {
            TwitchApi.loopserver();
        }
    }
-   TwitchApi.fetchUserData();
-   int FollowCount = TwitchApi.getFollowerCount(TwitchApi.userId);
-   int SubCount = TwitchApi.getSubscriberCount(TwitchApi.userId);
+   TwitchAPI::userData userdata =TwitchApi.fetchUserData();
+   int FollowCount = TwitchApi.getFollowerCount(userdata.userId);
+   int SubCount = TwitchApi.getSubscriberCount(userdata.userId); //This should not be allowed if the userId is not the oauth token owner
 
-   Serial.printf("\n\n User %s has %i followers and %i subscribers!", TwitchApi.username.c_str(), FollowCount, SubCount);
+   Serial.printf("\n\n User %s has %i followers and %i subscribers!", userdata.userName, FollowCount, SubCount);
     
 }
 void loop() {
-    // TwitchApi.loopserver();
-
 }
 
 #undef DEBUG_PRINT

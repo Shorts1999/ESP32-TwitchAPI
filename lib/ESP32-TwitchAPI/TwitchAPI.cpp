@@ -206,23 +206,24 @@ int TwitchAPI::getSubscriberCount(String toBroadcasterId) {
     return payloadJson["total"].as<int>();
 }
 
-userData TwitchAPI::fetchUserData(String username) {
+TwitchAPI::userData TwitchAPI::fetchUserData(String username) {
     log_d("Fetching user data");
     HTTPClient userRequestClient;
     //make synchronous, we need to wait for this info to display on page
     //request to helix/users without supplied name/ID will fetch user info of the supplied bearer
-    userRequestClient.begin("https://api.twitch.tv/helix/users");
+    String putInUsername = username == "" ? "" : "?login=" +username;
+    userRequestClient.begin("https://api.twitch.tv/helix/users" + putInUsername);
     userRequestClient.addHeader("Authorization", "Bearer " + TwitchApi.getAuthToken());
     userRequestClient.addHeader("Client-Id", "8460mbnko5p0n4e0fftgvvfaxf3fzt");
 
     int response = userRequestClient.GET();
 
-    if (response != 200) return;
+    if (response != 200) return TwitchAPI::userData{.userId="", .userName=username};
     if (userRequestClient.getSize() > 1024) {
         log_e("Payload too large!");
         log_d("Payload size was %i", userRequestClient.getSize());
         userRequestClient.end();
-        return;
+        return TwitchAPI::userData{.userId="", .userName=username};
     }
     DynamicJsonDocument payloadJson(512);
     StaticJsonDocument<128> JsonFilter;
