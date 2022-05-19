@@ -7,8 +7,6 @@
 const char* myClientId = "8460mbnko5p0n4e0fftgvvfaxf3fzt";
 const char* espDns = "esptwitchbot";
 
-TwitchAPI *twitchapi;
-
 void setup() {
     Serial.begin(115200);
     Preferences wifiNVS;
@@ -30,10 +28,25 @@ void setup() {
     }
     Serial.print("\n");
 
-    twitchapi = new TwitchAPI(espDns, myClientId);
+   TwitchApi.begin(espDns, myClientId);
+
+   if(!TwitchApi.checkAuthentication()){
+       log_d("Could not find an auth key, running authenticator!");
+       TwitchApi.runAuthenticator();
+       //If no token is found, run the authenticator:
+       while(true){
+           TwitchApi.loopserver();
+       }
+   }
+   TwitchApi.fetchUserData();
+   int FollowCount = TwitchApi.getFollowerCount(TwitchApi.userId);
+   int SubCount = TwitchApi.getSubscriberCount(TwitchApi.userId);
+
+   Serial.printf("\n\n User %s has %i followers and %i subscribers!", TwitchApi.username.c_str(), FollowCount, SubCount);
+    
 }
 void loop() {
-    twitchapi->loopserver();
+    // TwitchApi.loopserver();
 
 }
 
